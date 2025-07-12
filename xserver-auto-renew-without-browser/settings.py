@@ -8,8 +8,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="allow",
     )
-    username: str = Field()
-    password: str = Field()
+
+    id_vps: str = Field()
 
     def __init__(self):
         super().__init__()
