@@ -67,6 +67,8 @@ if __name__ == "__main__":
     )
 
     if "利用期限の更新手続きが完了しました。" in res2.text:
-        print("OK")
+        print("Done!")
+    elif "利用期限の1日前から更新手続きが可能です。" in res2.text:
+        print("Failed, please try again a day before.")
     else:
         raise RuntimeError("Failed to renew VPS")
