@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  xserver-auto-renew:
+    container_name: xserver-auto-renew
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./cookies.json:/app/cookies.json
+    env_file:
+      - .env
+    restart: always
