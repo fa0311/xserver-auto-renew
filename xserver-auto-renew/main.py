@@ -39,7 +39,7 @@ if __name__ == "__main__":
             update_url = f"https://secure.xserver.ne.jp/xapanel/xvps/server/freevps/extend/index?{urlencode(params)}"
 
             driver.get(update_url)
-
-            while True:
-                driver.implicitly_wait(1)
-                # TODO
+            driver.implicitly_wait(10)
+            driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+            driver.implicitly_wait(10)
+            # TODO
