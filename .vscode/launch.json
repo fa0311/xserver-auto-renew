@@ -9,10 +9,10 @@
       "console": "integratedTerminal"
     },
     {
-      "name": "Python: Debug login",
+      "name": "Python: Debug main without browser",
       "type": "debugpy",
       "request": "launch",
-      "module": "xserver-auto-renew.login",
+      "module": "xserver-auto-renew-without-browser.main",
       "console": "integratedTerminal"
     }
   ]

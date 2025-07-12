@@ -1,74 +1,45 @@
-import json
-import re
-from typing import Any
+from urllib.parse import urlencode, urlparse
 
-import requests
+from selenium import webdriver
+from selenium.webdriver.common.by import By
 
 from .settings import Settings
-
-
-def get_user_agent():
-    res = requests.get(
-        "https://raw.githubusercontent.com/fa0311/latest-user-agent/main/header.json"
-    )
-    headers = res.json()["chrome"]
-    headers.update(
-        {
-            "host": None,
-            "connection": None,
-            "accept-encoding": None,
-            "accept-language": "ja",
-        }
-    )
-    return headers
-
-
-def set_cookies(cookies: Any, session: requests.Session):
-    for cookie in cookies:
-        session.cookies.set(
-            cookie["name"],
-            cookie["value"],
-            domain=cookie.get("domain"),
-            path=cookie.get("path"),
-            secure=cookie.get("secure", False),
-        )
-
 
 if __name__ == "__main__":
     env = Settings()
 
-    session = requests.Session()
-    session.headers.update(get_user_agent())
-    with open("cookies.json", "r", encoding="utf-8") as f:
-        cookies = json.load(f)
-    set_cookies(cookies, session)
+    driver = webdriver.Chrome()
 
-    res1 = session.get(
-        "https://secure.xserver.ne.jp/xapanel/xvps/server/freevps/extend/index",
-        params={
-            "id_vps": env.id_vps,
-        },
-    )
+    driver.get("https://secure.xserver.ne.jp/xapanel/login/xvps/")
+    driver.find_element(By.CSS_SELECTOR, "#memberid").send_keys(env.username)
+    driver.find_element(By.CSS_SELECTOR, "#user_password").send_keys(env.password)
+    driver.execute_script("loginFunc()")
 
-    pattern = r'<input type="hidden" name="uniqid" value="(?P<uniqid>[^"]+)" />'
-    match = re.search(pattern, res1.text)
-    assert match is not None
-    uniqid = match.group("uniqid")
+    while True:
+        driver.implicitly_wait(1)
+        url = urlparse(driver.current_url)
+        if url.hostname == "secure.xserver.ne.jp":
+            if url.path == "/xapanel/myaccount/loginauth/index":
+                form1 = driver.find_element(By.CSS_SELECTOR, ".twoStepAuthBox")
+                form1.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
+                code = input("Code: ")
+                form2 = driver.find_element(By.CSS_SELECTOR, ".twoStepAuthBox")
+                form2.find_element(By.CSS_SELECTOR, "#auth_code").send_keys(code)
+                form2.find_element(By.CSS_SELECTOR, "input[type='submit']").click()
+            if url.path == "/xapanel/xvps/index":
+                break
 
-    res2 = session.post(
-        "https://secure.xserver.ne.jp/xapanel/xvps/server/freevps/extend/do",
-        # "https://secure.xserver.ne.jp/xapanel/xvps/server/freevps/extend/conf",
-        data={
-            "uniqid": uniqid,
-            "ethna_csrf": "",
-            "id_vps": env.id_vps,
-        },
-        files={},
-    )
+    table = driver.find_element(By.CSS_SELECTOR, "#serverContract")
+    for tr in table.find_elements(By.CSS_SELECTOR, "tr"):
+        if len(tr.find_elements(By.CSS_SELECTOR, ".freeServerIco")) > 0:
+            target = tr.find_element(By.CSS_SELECTOR, "[data-memo-target]")
+            id = target.get_attribute("data-memo-target")
 
-    if "利用期限の更新手続きが完了しました。" in res2.text:
-        print("Done!")
-    elif "利用期限の1日前から更新手続きが可能です。" in res2.text:
-        print("Failed, please try again a day before.")
-    else:
-        raise RuntimeError("Failed to renew VPS")
+            params = {"id_vps": id}
+            update_url = f"https://secure.xserver.ne.jp/xapanel/xvps/server/freevps/extend/index?{urlencode(params)}"
+
+            driver.get(update_url)
+            driver.implicitly_wait(10)
+            driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+            driver.implicitly_wait(10)
+            # TODO

@@ -39,38 +39,14 @@ pip install -r requirements.txt
 Create a `.env` file with the following variables:
 
 - `ID_VPS`: Your VPS ID from Xserver (required)
-- `USERNAME`: Your Xserver account username (required for automatic login)
-- `PASSWORD`: Your Xserver account password (required for automatic login)
 
 ```env
 ID_VPS=your_vps_id_here
-USERNAME=your_username_or_email_here
-PASSWORD=your_password_here
 ```
 
 <img src="image/README/1752250288684.png" alt="image" style="width: 50%;">
 
 ### Cookie Setup
-
-You have two options for setting up cookies:
-
-#### Option 1: Automatic Cookie Generation (Recommended)
-
-Use the automated login script to generate cookies:
-
-```bash
-python -m xserver-auto-renew.login
-```
-
-This script will:
-
-- Open a Chrome browser window
-- Automatically log in using your credentials from `.env`
-- Generate the `cookies.json` file automatically
-
-**Note**: Make sure you have Chrome installed and accessible in your PATH.
-
-#### Option 2: Manual Cookie Export
 
 1. Log in to your Xserver account in your browser
 2. Navigate to the VPS management page
@@ -109,26 +85,8 @@ xserver-auto-renew/
 
 ## Usage
 
-### Step 1: Generate Cookies (First Time Setup)
-
-Generate authentication cookies using the automated login:
-
-```bash
-python -m xserver-auto-renew.login
-```
-
-### Step 2: Run the Renewal Script
-
 Run the renewal script:
 
 ```bash
 python -m xserver-auto-renew.main
-```
-
-### Automation
-
-You can combine both steps for fully automated operation:
-
-```bash
-python -m xserver-auto-renew.login && python -m xserver-auto-renew.main
 ```

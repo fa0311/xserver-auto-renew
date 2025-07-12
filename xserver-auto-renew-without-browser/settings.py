@@ -9,8 +9,7 @@ class Settings(BaseSettings):
         extra="allow",
     )
 
-    username: str = Field()
-    password: str = Field()
+    id_vps: str = Field()
 
     def __init__(self):
         super().__init__()
