@@ -41,7 +41,7 @@ if __name__ == "__main__":
     session.headers.update(get_user_agent())
     with open("cookies.json", "r", encoding="utf-8") as f:
         cookies = json.load(f)
-    set_cookies(cookies, session)
+        set_cookies(cookies, session)
 
     res1 = session.get(
         "https://secure.xserver.ne.jp/xapanel/xvps/server/freevps/extend/index",
